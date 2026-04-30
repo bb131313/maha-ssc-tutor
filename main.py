@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-import google.generativeai as genai
+import google.genai as genai
 import os
 
 app = FastAPI()
@@ -14,6 +14,6 @@ async def home(): return HTMLResponse(content=HTML)
 @app.post("/chat")
 async def chat(req: Request):
     data = await req.json()
-    model = genai.GenerativeModel("gemini-pro")
+    model = genai.GenerativeModel(model_name="gemini-1.5-flash")
     response = model.generate_content(data.get("prompt",""))
     return {"response": response.text}

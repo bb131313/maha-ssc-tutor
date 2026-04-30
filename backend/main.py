@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-import google.generativeai as genai
+import google.genai as genai
 import os
 from pathlib import Path
 
@@ -24,8 +24,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 genai.configure(api_key=GEMINI_API_KEY)
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL_NAME"),
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
     "gemini-pro",
-    "gemini-1.0-pro",
 ]
 MODEL_CANDIDATES = [name for name in MODEL_CANDIDATES if name]
 
