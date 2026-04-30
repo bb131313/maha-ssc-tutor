@@ -2,21 +2,25 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from gtts import gTTS
-import openai
 import os
-import hashlib
+import requests
 from pathlib import Path
-from datetime import datetime
 
 app = FastAPI(title="Maharashtra SSC AI Tutor")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 STATIC_DIR = Path("static/audio")
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/audio", StaticFiles(directory="static/audio"), name="audio")
 
-openai.api_key = os.getenv("OPENAI_API_KEY", "")
+# Use Gemini API
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 CURRICULUM = {
     "Mathematics": {"chapters": [
@@ -80,34 +84,43 @@ class LearnReq(BaseModel):
     chapter: str
     language: str = "mr"
 
-def make_audio(text, lang):
-    try:
-        fid = hashlib.md5(str(datetime.now()).encode()).hexdigest()[:8]
-        fp = STATIC_DIR / f"{fid}.mp3"
-        gTTS(text=text[:500], lang=lang[:2], slow=False).save(str(fp))
-        return f"/audio/{fid}.mp3"
-    except: return None
+def get_gemini_response(prompt, api_key):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    data = {"contents": [{"parts": [{"text": prompt}]}]}
+    
+    response = requests.post(url, headers=headers, json=data)
+    result = response.json()
+    
+    if "error" in result:
+        raise Exception(result["error"]["message"])
+    
+    return result["candidates"][0]["content"]["parts"][0]["text"]
 
 @app.get("/")
 def root():
-    return {"app": "Maharashtra SSC AI Tutor", "status": "active", "message": "Welcome! Select subject and chapter."}
+    return {"app": "Maharashtra SSC AI Tutor", "status": "active", "model": "Google Gemini (Free)"}
 
 @app.get("/api/curriculum")
-def get_curr(): return CURRICULUM
+def get_curriculum():
+    return CURRICULUM
 
 @app.get("/api/subjects")
-def get_subjects(): return {"subjects": list(CURRICULUM.keys())}
+def get_subjects():
+    return {"subjects": list(CURRICULUM.keys())}
 
 @app.post("/api/learn")
 def learn(req: LearnReq):
-    if not openai.api_key: raise HTTPException(500, "Add OPENAI_API_KEY in Render")
-    try:
-        lang_map = {
-            "mr": "in Marathi (मराठी)",
-            "hi": "in Hindi (हिंदी)", 
-            "en": "in English"
-        }
-        prompt = f"""You are expert Maharashtra Board SSC 10th class teacher. Student is studying '{req.chapter}' in {req.subject}.
+    if not GEMINI_API_KEY:
+        raise HTTPException(500, "GEMINI_API_KEY not set. Get free key at https://aistudio.google.com")
+    
+    lang_map = {
+        "mr": "in Marathi (मराठी)",
+        "hi": "in Hindi (हिंदी)", 
+        "en": "in English"
+    }
+    
+    prompt = f"""You are expert Maharashtra Board SSC 10th class teacher. Student is studying '{req.chapter}' in {req.subject}.
 Respond {lang_map.get(req.language, 'in English')}.
 Rules:
 1. Simple explanation with examples
@@ -115,22 +128,18 @@ Rules:
 3. 1 common Maharashtra Board exam question about this topic
 4. Memory tip for exam preparation
 5. Be encouraging and friendly"""
-        
-        resp = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.8,
-            max_tokens=1500
-        )
-        txt = resp.choices[0].message.content
-        audio = make_audio(txt, req.language)
+    
+    try:
+        explanation = get_gemini_response(prompt, GEMINI_API_KEY)
         
         chapters = CURRICULUM.get(req.subject, {}).get("chapters", [])
         link = next((c["link"] for c in chapters if c["title"] == req.chapter), "")
         
-        return {"explanation": txt, "audio_url": audio, "textbook_link": link}
-    except openai.AuthenticationError:
-        raise HTTPException(401, "Invalid API Key")
+        return {
+            "explanation": explanation, 
+            "audio_url": None, 
+            "textbook_link": link
+        }
     except Exception as e:
         raise HTTPException(500, str(e))
 
