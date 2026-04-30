@@ -107,8 +107,9 @@ class LearnReq(BaseModel):
     chapter: str
     language: str = "mr"
 
-def get_gemini_response(prompt):
-    response = GEMINI_MODEL.generate_content(prompt)
+def get_gemini_response(prompt, model="gemini-1.5-flash"):
+    m = genai.GenerativeModel(model)
+    response = m.generate_content(prompt)
     return getattr(response, "text", None) or response.output[0].content[0].text
 
 @app.get("/")
@@ -148,7 +149,7 @@ Rules:
 5. Be encouraging and friendly"""
     
     try:
-        explanation = get_gemini_response(prompt, GEMINI_API_KEY)
+        explanation = get_gemini_response(prompt, GEMINI_MODEL_NAME)
         
         chapters = CURRICULUM.get(req.subject, {}).get("chapters", [])
         link = next((c["link"] for c in chapters if c["title"] == req.chapter), "")
