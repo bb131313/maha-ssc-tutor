@@ -14,6 +14,6 @@ async def home(): return HTMLResponse(content=HTML)
 @app.post("/chat")
 async def chat(req: Request):
     data = await req.json()
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-pro")
     response = model.generate_content(data.get("prompt",""))
     return {"response": response.text}
