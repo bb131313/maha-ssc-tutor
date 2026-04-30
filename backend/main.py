@@ -2,8 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+import google.generativeai as genai
 import os
-import requests
 from pathlib import Path
 
 app = FastAPI(title="Maharashtra SSC AI Tutor")
@@ -21,6 +21,29 @@ app.mount("/audio", StaticFiles(directory="static/audio"), name="audio")
 
 # Use Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+genai.configure(api_key=GEMINI_API_KEY)
+MODEL_CANDIDATES = [
+    os.getenv("GEMINI_MODEL_NAME"),
+    "gemini-1.5-flash",
+    "models/gemini-1.5-flash",
+    "gemini-1.5-flash-001",
+    "gemini-1.5-flash-8b",
+]
+MODEL_CANDIDATES = [name for name in MODEL_CANDIDATES if name]
+
+def create_gemini_model():
+    last_error = None
+    for model_name in MODEL_CANDIDATES:
+        try:
+            model = genai.GenerativeModel(model_name)
+            return model, model_name
+        except Exception as exc:
+            last_error = exc
+    raise RuntimeError(
+        f"Unable to instantiate any Gemini model from {MODEL_CANDIDATES}: {last_error}"
+    )
+
+GEMINI_MODEL, GEMINI_MODEL_NAME = create_gemini_model()
 
 CURRICULUM = {
     "Mathematics": {"chapters": [
@@ -84,22 +107,17 @@ class LearnReq(BaseModel):
     chapter: str
     language: str = "mr"
 
-def get_gemini_response(prompt, api_key):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-    headers = {"Content-Type": "application/json"}
-    data = {"contents": [{"parts": [{"text": prompt}]}]}
-    
-    response = requests.post(url, headers=headers, json=data)
-    result = response.json()
-    
-    if "error" in result:
-        raise Exception(result["error"]["message"])
-    
-    return result["candidates"][0]["content"]["parts"][0]["text"]
+def get_gemini_response(prompt):
+    response = GEMINI_MODEL.generate_content(prompt)
+    return getattr(response, "text", None) or response.output[0].content[0].text
 
 @app.get("/")
 def root():
-    return {"app": "Maharashtra SSC AI Tutor", "status": "active", "model": "Google Gemini (Free)"}
+    return {
+        "app": "Maharashtra SSC AI Tutor",
+        "status": "active",
+        "model": GEMINI_MODEL_NAME,
+    }
 
 @app.get("/api/curriculum")
 def get_curriculum():
