@@ -1,7 +1,30 @@
 FROM node:18-alpine
-WORKDIR /code
-COPY package.json .
-RUN npm install
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --prefer-offline --no-audit
+
+# Copy app files
 COPY . .
+
+# Build the React app
+RUN npm run build
+
+# Install serve to run the production build
+RUN npm install -g serve
+
 EXPOSE 3000
-CMD ["npm", "start"]
+
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:3000 || exit 1
+
+# Start the app
+CMD ["serve", "-s", "build", "-l", "3000"]

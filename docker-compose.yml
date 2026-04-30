@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL_NAME=models/gemini-2.5-flash
+    volumes:
+      - ./backend/student_progress.db:/app/student_progress.db
+      - ./backend/static:/app/static
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - maha-network
+    labels:
+      - "com.example.description=Maharashtra SSC AI Tutor Backend API"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - maha-network
+    labels:
+      - "com.example.description=Maharashtra SSC AI Tutor Frontend"
+
+networks:
+  maha-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  static_files:

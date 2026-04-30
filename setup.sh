@@ -1,20 +1,152 @@
 #!/bin/bash
-echo "🚀 Creating Maharashtra SSC AI Tutor..."
 
-# Create proper folder structure
-rm -rf backend frontend static docker-compose.yml 2>/dev/null
-mkdir -p backend/static/audio frontend/public frontend/src
+# Maharashtra SSC AI Tutor - Complete Setup Script
+# This script sets everything up for you!
 
-# ===================== BACKEND =====================
+set -e
 
-cat > backend/requirements.txt << 'EOF'
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-openai==1.3.5
-gtts==2.5.1
-pydantic==2.5.2
-python-multipart==0.0.6
+echo "🎓 Maharashtra Board SSC AI Tutor - Enhanced Version"
+echo "===================================================="
+echo ""
+echo "Features:"
+echo "✨ AI-Powered Explanations in Simple English"
+echo "📊 Automatic Progress Tracking"
+echo "✏️  Knowledge Testing with Board Questions"
+echo "🗣️  Multi-language Support (Marathi, Hindi, English)"
+echo "🚀 Always Available (Never goes down)"
+echo ""
+
+# Check if Docker is installed
+if ! command -v docker &> /dev/null; then
+    echo "❌ Docker is not installed. Please install Docker Desktop first."
+    echo "   Visit: https://www.docker.com/products/docker-desktop"
+    exit 1
+fi
+
+if ! command -v docker-compose &> /dev/null; then
+    echo "❌ Docker Compose is not installed."
+    echo "   It usually comes with Docker Desktop. Please reinstall Docker."
+    exit 1
+fi
+
+echo "✅ Docker and Docker Compose found"
+echo ""
+
+# Get Gemini API Key
+echo "🔑 Getting Gemini API Key..."
+echo ""
+if [ -z "$GEMINI_API_KEY" ]; then
+    echo "📋 You need a FREE Gemini API key to use this app."
+    echo ""
+    echo "Steps to get your API key:"
+    echo "1. Visit: https://aistudio.google.com"
+    echo "2. Click 'Get API Key'"
+    echo "3. Click 'Create new API key in new project'"
+    echo "4. Copy the API key"
+    echo ""
+    
+    read -p "Paste your Gemini API key here: " GEMINI_API_KEY
+fi
+
+if [ -z "$GEMINI_API_KEY" ]; then
+    echo "❌ API key is required. Please try again."
+    exit 1
+fi
+
+# Create .env file
+echo "📝 Creating configuration..."
+cat > .env << EOF
+GEMINI_API_KEY=$GEMINI_API_KEY
+GEMINI_MODEL_NAME=models/gemini-2.5-flash
 EOF
+
+echo "✅ Configuration created"
+echo ""
+
+# Create required directories
+mkdir -p ./backend/static/audio
+mkdir -p ./backend/backups
+
+echo "🚀 Starting application with Docker Compose..."
+echo "This may take 1-2 minutes on first run..."
+echo ""
+
+# Build and start containers
+docker-compose up --build -d
+
+echo ""
+echo "⏳ Waiting for services to be ready..."
+echo ""
+
+# Wait for backend health check
+echo "Checking backend..."
+for i in {1..20}; do
+    if curl -f http://localhost:8000/health &> /dev/null; then
+        echo "✅ Backend is healthy!"
+        break
+    fi
+    echo "   Attempt $i/20... (waiting for backend to start)"
+    sleep 3
+done
+
+# Wait for frontend
+echo "Checking frontend..."
+for i in {1..20}; do
+    if curl -f http://localhost:3000 &> /dev/null; then
+        echo "✅ Frontend is healthy!"
+        break
+    fi
+    echo "   Attempt $i/20... (waiting for frontend to start)"
+    sleep 3
+done
+
+echo ""
+echo "═════════════════════════════════════════════════════"
+echo "✅ SETUP COMPLETE!"
+echo "═════════════════════════════════════════════════════"
+echo ""
+echo "🎓 Your AI Tutor is Ready!"
+echo ""
+echo "📱 OPEN THE APP:"
+echo "   👉 http://localhost:3000"
+echo ""
+echo "📚 QUICK START GUIDE:"
+echo "   1. Enter Student ID (e.g., SSC001)"
+echo "   2. Enter your full name"
+echo "   3. Enter your email"
+echo "   4. Click 'Start Learning'"
+echo "   5. Select a Subject from the left"
+echo "   6. Click a Chapter"
+echo "   7. Read AI explanation"
+echo "   8. Mark complete when done"
+echo "   9. Take quizzes to test knowledge"
+echo "   10. Track your progress!"
+echo ""
+echo "💪 Features Available:"
+echo "   ✨ Detailed explanations in simple language"
+echo "   📊 Automatic progress tracking"
+echo "   ✏️  Quizzes from board exam papers"
+echo "   🗣️  3 language options (Marathi, Hindi, English)"
+echo "   🚀 Always available (auto-recovery)"
+echo ""
+echo "📖 LEARN MORE:"
+echo "   README.md        - Complete guide"
+echo "   FEATURES.md      - All features explained"
+echo "   DEPLOYMENT.md    - For production/scaling"
+echo ""
+echo "🛑 TO STOP THE APP:"
+echo "   docker-compose down"
+echo ""
+echo "🔄 TO VIEW LOGS:"
+echo "   docker-compose logs -f"
+echo ""
+echo "🏥 TO CHECK HEALTH:"
+echo "   curl http://localhost:8000/health"
+echo ""
+echo "❓ NEED HELP? Check logs:"
+echo "   docker-compose logs backend"
+echo "   docker-compose logs frontend"
+echo ""
 
 cat > backend/Dockerfile << 'EOF'
 FROM python:3.11-slim

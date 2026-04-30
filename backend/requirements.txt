@@ -4,3 +4,4 @@ google-genai>=1.74.0
 pydantic>=2.5.0
 python-multipart>=0.0.6
 aiofiles>=23.2.0
+pyttsx3>=2.90
