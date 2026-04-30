@@ -24,10 +24,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 genai.configure(api_key=GEMINI_API_KEY)
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL_NAME"),
-    "gemini-1.5-flash",
-    "models/gemini-1.5-flash",
-    "gemini-1.5-flash-001",
-    "gemini-1.5-flash-8b",
+    "gemini-1.5-pro",
+    "gemini-1.0-pro",
+    "gemini-pro",
 ]
 MODEL_CANDIDATES = [name for name in MODEL_CANDIDATES if name]
 
