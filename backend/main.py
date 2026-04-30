@@ -21,7 +21,7 @@ app.mount("/audio", StaticFiles(directory="static/audio"), name="audio")
 
 # Use Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL_NAME"),
     "gemini-1.5-flash",
@@ -34,15 +34,19 @@ def create_gemini_model():
     last_error = None
     for model_name in MODEL_CANDIDATES:
         try:
-            model = genai.GenerativeModel(model_name)
-            return model, model_name
+            # Test by generating content
+            response = client.models.generate_content(
+                model=model_name,
+                contents="test"
+            )
+            return model_name
         except Exception as exc:
             last_error = exc
     raise RuntimeError(
         f"Unable to instantiate any Gemini model from {MODEL_CANDIDATES}: {last_error}"
     )
 
-GEMINI_MODEL, GEMINI_MODEL_NAME = create_gemini_model()
+GEMINI_MODEL_NAME = create_gemini_model()
 
 CURRICULUM = {
     "Mathematics": {"chapters": [
@@ -107,9 +111,11 @@ class LearnReq(BaseModel):
     language: str = "mr"
 
 def get_gemini_response(prompt, model="gemini-1.5-flash"):
-    m = genai.GenerativeModel(model)
-    response = m.generate_content(prompt)
-    return getattr(response, "text", None) or response.output[0].content[0].text
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt
+    )
+    return response.text
 
 @app.get("/")
 def root():
