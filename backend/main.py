@@ -24,9 +24,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 client = genai.Client(api_key=GEMINI_API_KEY)
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL_NAME"),
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
-    "gemini-pro",
+    "models/gemini-2.0-flash",
+    "models/gemini-2.5-flash",
+    "models/gemini-pro-latest",
+    "models/gemini-flash-latest",
 ]
 MODEL_CANDIDATES = [name for name in MODEL_CANDIDATES if name]
 
@@ -110,7 +111,7 @@ class LearnReq(BaseModel):
     chapter: str
     language: str = "mr"
 
-def get_gemini_response(prompt, model="gemini-1.5-flash"):
+def get_gemini_response(prompt, model="models/gemini-2.0-flash"):
     response = client.models.generate_content(
         model=model,
         contents=prompt

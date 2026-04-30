@@ -15,7 +15,7 @@ async def home(): return HTMLResponse(content=HTML)
 async def chat(req: Request):
     data = await req.json()
     response = client.models.generate_content(
-        model="gemini-1.5-flash",
+        model="models/gemini-2.0-flash",
         contents=data.get("prompt","")
     )
     return {"response": response.text}
