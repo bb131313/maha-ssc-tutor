@@ -24,10 +24,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 client = genai.Client(api_key=GEMINI_API_KEY)
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL_NAME"),
-    "models/gemini-2.0-flash",
     "models/gemini-2.5-flash",
-    "models/gemini-pro-latest",
     "models/gemini-flash-latest",
+    "models/gemini-2.0-flash",
+    "models/gemini-pro-latest",
 ]
 MODEL_CANDIDATES = [name for name in MODEL_CANDIDATES if name]
 
