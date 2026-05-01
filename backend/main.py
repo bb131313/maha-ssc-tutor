@@ -180,58 +180,58 @@ if GEMINI_API_KEY:
 
 CURRICULUM = {
     "Mathematics": {"chapters": [
-        {"id": 1, "title": "Linear Equations in Two Variables", "link": "https://www.ebalbharati.in/book-content/10/55/1/1"},
-        {"id": 2, "title": "Quadratic Equations", "link": "https://www.ebalbharati.in/book-content/10/55/1/2"},
-        {"id": 3, "title": "Arithmetic Progression", "link": "https://www.ebalbharati.in/book-content/10/55/1/3"},
-        {"id": 4, "title": "Financial Planning", "link": "https://www.ebalbharati.in/book-content/10/55/1/4"},
-        {"id": 5, "title": "Probability", "link": "https://www.ebalbharati.in/book-content/10/55/1/5"},
-        {"id": 6, "title": "Statistics", "link": "https://www.ebalbharati.in/book-content/10/55/1/6"},
-        {"id": 7, "title": "Geometry Triangles", "link": "https://www.ebalbharati.in/book-content/10/55/1/7"},
-        {"id": 8, "title": "Coordinate Geometry", "link": "https://www.ebalbharati.in/book-content/10/55/1/8"},
-        {"id": 9, "title": "Trigonometry", "link": "https://www.ebalbharati.in/book-content/10/55/1/9"},
-        {"id": 10, "title": "Mensuration", "link": "https://www.ebalbharati.in/book-content/10/55/1/10"}
+        {"id": 1, "title": "Linear Equations in Two Variables", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 2, "title": "Quadratic Equations", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 3, "title": "Arithmetic Progression", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 4, "title": "Financial Planning", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 5, "title": "Probability", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 6, "title": "Statistics", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 7, "title": "Geometry Triangles", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 8, "title": "Coordinate Geometry", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 9, "title": "Trigonometry", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 10, "title": "Mensuration", "link": "https://books.ebalbharati.in/ebook.aspx"}
     ]},
     "Science": {"chapters": [
-        {"id": 1, "title": "Gravitation", "link": "https://www.ebalbharati.in/book-content/10/56/1/1"},
-        {"id": 2, "title": "Periodic Classification", "link": "https://www.ebalbharati.in/book-content/10/56/1/2"},
-        {"id": 3, "title": "Chemical Reactions", "link": "https://www.ebalbharati.in/book-content/10/56/1/3"},
-        {"id": 4, "title": "Effects of Electric Current", "link": "https://www.ebalbharati.in/book-content/10/56/1/4"},
-        {"id": 5, "title": "Refraction of Light", "link": "https://www.ebalbharati.in/book-content/10/56/1/5"},
-        {"id": 6, "title": "Lenses", "link": "https://www.ebalbharati.in/book-content/10/56/1/6"},
-        {"id": 7, "title": "Carbon Compounds", "link": "https://www.ebalbharati.in/book-content/10/56/1/7"},
-        {"id": 8, "title": "Metals and Non-metals", "link": "https://www.ebalbharati.in/book-content/10/56/1/8"},
-        {"id": 9, "title": "Biological Processes", "link": "https://www.ebalbharati.in/book-content/10/56/1/9"},
-        {"id": 10, "title": "Heredity and Evolution", "link": "https://www.ebalbharati.in/book-content/10/56/1/10"}
+        {"id": 1, "title": "Gravitation", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 2, "title": "Periodic Classification", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 3, "title": "Chemical Reactions", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 4, "title": "Effects of Electric Current", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 5, "title": "Refraction of Light", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 6, "title": "Lenses", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 7, "title": "Carbon Compounds", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 8, "title": "Metals and Non-metals", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 9, "title": "Biological Processes", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 10, "title": "Heredity and Evolution", "link": "https://books.ebalbharati.in/ebook.aspx"}
     ]},
     "English": {"chapters": [
-        {"id": 1, "title": "The Song of the Rain", "link": "https://www.ebalbharati.in/book-content/10/59/1/1"},
-        {"id": 2, "title": "The Last Labyrinth", "link": "https://www.ebalbharati.in/book-content/10/59/1/2"},
-        {"id": 3, "title": "Subha-Saraswati Yojana", "link": "https://www.ebalbharati.in/book-content/10/59/1/3"},
-        {"id": 4, "title": "Uncle's Dream", "link": "https://www.ebalbharati.in/book-content/10/59/1/4"},
-        {"id": 5, "title": "The Attic", "link": "https://www.ebalbharati.in/book-content/10/59/1/5"},
-        {"id": 6, "title": "Technology with a Human Face", "link": "https://www.ebalbharati.in/book-content/10/59/1/6"}
+        {"id": 1, "title": "The Song of the Rain", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 2, "title": "The Last Labyrinth", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 3, "title": "Subha-Saraswati Yojana", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 4, "title": "Uncle's Dream", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 5, "title": "The Attic", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 6, "title": "Technology with a Human Face", "link": "https://books.ebalbharati.in/ebook.aspx"}
     ]},
     "Marathi": {"chapters": [
-        {"id": 1, "title": "Bharat Ratna", "link": "https://www.ebalbharati.in/book-content/10/57/1/1"},
-        {"id": 2, "title": "Saambhawalya", "link": "https://www.ebalbharati.in/book-content/10/57/1/2"},
-        {"id": 3, "title": "Mazi Aai", "link": "https://www.ebalbharati.in/book-content/10/57/1/3"},
-        {"id": 4, "title": "Tic-Tac-Toe", "link": "https://www.ebalbharati.in/book-content/10/57/1/4"},
-        {"id": 5, "title": "Babal", "link": "https://www.ebalbharati.in/book-content/10/57/1/5"}
+        {"id": 1, "title": "Bharat Ratna", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 2, "title": "Saambhawalya", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 3, "title": "Mazi Aai", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 4, "title": "Tic-Tac-Toe", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 5, "title": "Babal", "link": "https://books.ebalbharati.in/ebook.aspx"}
     ]},
     "Hindi": {"chapters": [
-        {"id": 1, "title": "Bahut Girevo Na Chowk", "link": "https://www.ebalbharati.in/book-content/10/58/1/1"},
-        {"id": 2, "title": "Gadbad Aatmagya", "link": "https://www.ebalbharati.in/book-content/10/58/1/2"},
-        {"id": 3, "title": "Maa", "link": "https://www.ebalbharati.in/book-content/10/58/1/3"},
-        {"id": 4, "title": "Kalam Ki Chai", "link": "https://www.ebalbharati.in/book-content/10/58/1/4"}
+        {"id": 1, "title": "Bahut Girevo Na Chowk", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 2, "title": "Gadbad Aatmagya", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 3, "title": "Maa", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 4, "title": "Kalam Ki Chai", "link": "https://books.ebalbharati.in/ebook.aspx"}
     ]},
     "Social Science": {"chapters": [
-        {"id": 1, "title": "Imperialism", "link": "https://www.ebalbharati.in/book-content/10/60/1/1"},
-        {"id": 2, "title": "Indian War of Independence 1857", "link": "https://www.ebalbharati.in/book-content/10/60/1/2"},
-        {"id": 3, "title": "Indian National Movement", "link": "https://www.ebalbharati.in/book-content/10/60/1/3"},
-        {"id": 4, "title": "Indian Physiographic Divisions", "link": "https://www.ebalbharati.in/book-content/10/60/2/1"},
-        {"id": 5, "title": "Energy Resources", "link": "https://www.ebalbharati.in/book-content/10/60/2/2"},
-        {"id": 6, "title": "Indian Constitution", "link": "https://www.ebalbharati.in/book-content/10/60/3/1"},
-        {"id": 7, "title": "Parliament", "link": "https://www.ebalbharati.in/book-content/10/60/3/2"}
+        {"id": 1, "title": "Imperialism", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 2, "title": "Indian War of Independence 1857", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 3, "title": "Indian National Movement", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 4, "title": "Indian Physiographic Divisions", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 5, "title": "Energy Resources", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 6, "title": "Indian Constitution", "link": "https://books.ebalbharati.in/ebook.aspx"},
+        {"id": 7, "title": "Parliament", "link": "https://books.ebalbharati.in/ebook.aspx"}
     ]}
 }
 
