@@ -7,7 +7,7 @@ import {
   Clock, TrendingUp, Award
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || '';
 
 const LANGUAGES = [
   { code: 'mr', name: 'मराठी', label: 'Marathi' },
@@ -26,7 +26,7 @@ function App() {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(null);
   const [language, setLanguage] = useState('mr');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [teaching, setTeaching] = useState(false);
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
@@ -47,7 +47,7 @@ function App() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        const response = await axios.get(`${API_URL}/health`, { timeout: 5000 });
+        const response = await axios.get(apiUrl('/health'), { timeout: 5000 });
         if (response.data.status === 'healthy') {
           setApiStatus('healthy');
           setReconnectAttempts(0);
@@ -74,7 +74,7 @@ function App() {
 
     const validateSession = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/session/validate/${studentId}`, { timeout: 5000 });
+        const res = await axios.get(apiUrl(`/api/session/validate/${studentId}`), { timeout: 5000 });
         if (res.data.valid) {
           setSessionValid(true);
           setSessionTimeRemaining(res.data.remaining_minutes * 60);
@@ -104,11 +104,13 @@ function App() {
     }
   }, [sessionTimeRemaining]);
 
+  const apiUrl = (path) => `${API_URL || ''}${path}`;
+
   const fetchCurriculum = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await axios.get(`${API_URL}/api/curriculum`, { timeout: 10000 });
+      const res = await axios.get(apiUrl('/api/curriculum'), { timeout: 10000 });
       setCurriculum(res.data);
       setSubjects(Object.keys(res.data));
     } catch (err) {
@@ -137,7 +139,7 @@ function App() {
       const newStudentName = formData.get('studentName');
       const email = formData.get('email');
 
-      const res = await axios.post(`${API_URL}/api/session/create`, {
+      const res = await axios.post(apiUrl('/api/session/create'), {
         student_id: newStudentId,
         name: newStudentName,
         email: email
@@ -149,7 +151,8 @@ function App() {
       setSessionValid(true);
       await fetchCurriculum();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to register. Please try again.');
+      console.error('Registration error', err);
+      setError(err.response?.data?.message || err.message || 'Failed to register. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -165,7 +168,7 @@ function App() {
   const handleLogout = async () => {
     try {
       if (studentId) {
-        await axios.post(`${API_URL}/api/session/close/${studentId}`, {}, { timeout: 5000 });
+        await axios.post(apiUrl(`/api/session/close/${studentId}`), {}, { timeout: 5000 });
       }
     } catch (err) {
       console.log('Error closing session:', err);
@@ -187,7 +190,7 @@ function App() {
     setError(null);
     
     try {
-      const res = await axios.post(`${API_URL}/api/learn`, {
+      const res = await axios.post(apiUrl('/api/learn'), {
         subject: selectedSubject,
         chapter: chapter.title,
         language: language
@@ -206,7 +209,7 @@ function App() {
     if (!studentId || !selectedChapter) return;
     
     try {
-      await axios.post(`${API_URL}/api/mark-complete`, {
+      await axios.post(apiUrl('/api/mark-complete'), {
         student_id: studentId,
         subject: selectedSubject,
         chapter: selectedChapter.title
@@ -223,7 +226,7 @@ function App() {
     if (!studentId) return;
     
     try {
-      const res = await axios.get(`${API_URL}/api/student-progress/${studentId}`, { timeout: 10000 });
+      const res = await axios.get(apiUrl(`/api/student-progress/${studentId}`), { timeout: 10000 });
       setProgress(res.data.progress);
     } catch (err) {
       console.log('Could not load progress:', err.message);
@@ -232,7 +235,7 @@ function App() {
 
   const toggleAudio = () => {
     if (response?.audio_url && audioRef.current) {
-      audioRef.current.src = `${API_URL}${response.audio_url}`;
+      audioRef.current.src = apiUrl(response.audio_url);
       audioRef.current.play();
       setPlaying(true);
     }

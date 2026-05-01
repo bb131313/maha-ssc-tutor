@@ -131,7 +131,7 @@ init_db()
 
 # Use Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = None
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL_NAME"),
     "models/gemini-2.5-flash",
@@ -140,24 +140,28 @@ MODEL_CANDIDATES = [
     "models/gemini-pro-latest",
 ]
 MODEL_CANDIDATES = [name for name in MODEL_CANDIDATES if name]
+GEMINI_MODEL_NAME = None
 
-def create_gemini_model():
-    last_error = None
-    for model_name in MODEL_CANDIDATES:
-        try:
-            # Test by generating content
-            response = client.models.generate_content(
-                model=model_name,
-                contents="test"
-            )
-            return model_name
-        except Exception as exc:
-            last_error = exc
-    raise RuntimeError(
-        f"Unable to instantiate any Gemini model from {MODEL_CANDIDATES}: {last_error}"
-    )
+if GEMINI_API_KEY:
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
-GEMINI_MODEL_NAME = create_gemini_model()
+    def create_gemini_model():
+        last_error = None
+        for model_name in MODEL_CANDIDATES:
+            try:
+                # Test by generating content
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents="test"
+                )
+                return model_name
+            except Exception as exc:
+                last_error = exc
+        raise RuntimeError(
+            f"Unable to instantiate any Gemini model from {MODEL_CANDIDATES}: {last_error}"
+        )
+
+    GEMINI_MODEL_NAME = create_gemini_model()
 
 CURRICULUM = {
     "Mathematics": {"chapters": [
@@ -353,6 +357,8 @@ def save_quiz_result(student_id: str, subject: str, quiz_id: str, score: int, to
         return False
 
 def get_gemini_response(prompt, model="models/gemini-2.0-flash"):
+    if not client or not GEMINI_MODEL_NAME:
+        raise HTTPException(500, "GEMINI_API_KEY is not configured. Set GEMINI_API_KEY to use learning features.")
     response = client.models.generate_content(
         model=model,
         contents=prompt
