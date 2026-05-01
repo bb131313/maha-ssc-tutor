@@ -235,9 +235,16 @@ function App() {
 
   const toggleAudio = () => {
     if (response?.audio_url && audioRef.current) {
-      audioRef.current.src = apiUrl(response.audio_url);
-      audioRef.current.play();
-      setPlaying(true);
+      if (playing) {
+        audioRef.current.pause();
+        setPlaying(false);
+      } else {
+        audioRef.current.src = apiUrl(response.audio_url);
+        audioRef.current.play().catch(err => {
+          console.log('Play failed:', err);
+        });
+        setPlaying(true);
+      }
     }
   };
 
@@ -251,6 +258,17 @@ function App() {
       loadStudentProgress();
     }
   }, [studentId, sessionValid]);
+
+  // Auto-play audio when response is received
+  useEffect(() => {
+    if (response?.audio_url && audioRef.current) {
+      audioRef.current.src = apiUrl(response.audio_url);
+      audioRef.current.play().catch(err => {
+        console.log('Auto-play failed:', err);
+      });
+      setPlaying(true);
+    }
+  }, [response]);
 
   // Login Form
   if (showLoginForm) {

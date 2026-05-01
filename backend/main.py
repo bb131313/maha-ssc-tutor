@@ -11,6 +11,8 @@ import sqlite3
 from typing import List, Optional, Dict
 import threading
 import time
+import pyttsx3
+from gtts import gTTS
 
 app = FastAPI(title="Maharashtra SSC AI Tutor")
 
@@ -522,12 +524,19 @@ Keep language simple, friendly, and encouraging. Use easy words. Be like a teach
             try:
                 explanation = get_gemini_response(prompt, GEMINI_MODEL_NAME)
                 
+                # Generate audio
+                audio_filename = f"{req.subject}_{req.chapter}_{req.language}_{int(time.time())}.mp3"
+                audio_path = STATIC_DIR / audio_filename
+                
+                tts = gTTS(text=explanation, lang=req.language, slow=False)
+                tts.save(str(audio_path))
+                
                 chapters = CURRICULUM.get(req.subject, {}).get("chapters", [])
                 link = next((c["link"] for c in chapters if c["title"] == req.chapter), "")
                 
                 return {
                     "explanation": explanation, 
-                    "audio_url": None, 
+                    "audio_url": f"/audio/{audio_filename}", 
                     "textbook_link": link,
                     "timestamp": datetime.now().isoformat()
                 }
