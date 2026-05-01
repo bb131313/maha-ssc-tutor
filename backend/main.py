@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-import google.genai as genai
+import google.generativeai as genai
 import os
 from pathlib import Path
 import json
@@ -67,58 +67,65 @@ def get_db_connection(timeout=5):
 
 def init_db():
     """Initialize SQLite database with retry logic"""
+    conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-    
-    # Students table
-    cursor.execute('''CREATE TABLE IF NOT EXISTS students (
-        student_id TEXT PRIMARY KEY,
-        name TEXT,
-        email TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
-    
-    # Progress tracking
-    cursor.execute('''CREATE TABLE IF NOT EXISTS progress (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_id TEXT,
-        subject TEXT,
-        chapter TEXT,
-        completed BOOLEAN DEFAULT 0,
-        completion_date TIMESTAMP,
-        time_spent_minutes INTEGER DEFAULT 0,
-        FOREIGN KEY(student_id) REFERENCES students(student_id)
-    )''')
-    
-    # Quiz results
-    cursor.execute('''CREATE TABLE IF NOT EXISTS quiz_results (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_id TEXT,
-        subject TEXT,
-        quiz_id TEXT,
-        score INTEGER,
-        total_questions INTEGER,
-        percentage REAL,
-        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        answers_text TEXT,
-        FOREIGN KEY(student_id) REFERENCES students(student_id)
-    )''')
-    
-    # Learning history
-    cursor.execute('''CREATE TABLE IF NOT EXISTS learning_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_id TEXT,
-        subject TEXT,
-        chapter TEXT,
-        question_asked TEXT,
-        explanation_received TEXT,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(student_id) REFERENCES students(student_id)
-    )''')
-    
-    conn.commit()
-    conn.close()
+
+        # Students table
+        cursor.execute('''CREATE TABLE IF NOT EXISTS students (
+            student_id TEXT PRIMARY KEY,
+            name TEXT,
+            email TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+
+        # Progress tracking
+        cursor.execute('''CREATE TABLE IF NOT EXISTS progress (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT,
+            subject TEXT,
+            chapter TEXT,
+            completed BOOLEAN DEFAULT 0,
+            completion_date TIMESTAMP,
+            time_spent_minutes INTEGER DEFAULT 0,
+            FOREIGN KEY(student_id) REFERENCES students(student_id)
+        )''')
+
+        # Quiz results
+        cursor.execute('''CREATE TABLE IF NOT EXISTS quiz_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT,
+            subject TEXT,
+            quiz_id TEXT,
+            score INTEGER,
+            total_questions INTEGER,
+            percentage REAL,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            answers_text TEXT,
+            FOREIGN KEY(student_id) REFERENCES students(student_id)
+        )''')
+
+        # Learning history
+        cursor.execute('''CREATE TABLE IF NOT EXISTS learning_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT,
+            subject TEXT,
+            chapter TEXT,
+            question_asked TEXT,
+            explanation_received TEXT,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(student_id) REFERENCES students(student_id)
+        )''')
+
+        conn.commit()
+    except Exception:
+        if conn:
+            conn.rollback()
+        raise
+    finally:
+        if conn:
+            conn.close()
 
 init_db()
 
