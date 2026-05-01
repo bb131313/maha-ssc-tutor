@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-import google.generativeai as genai
+import google.genai as genai
 import os
 from pathlib import Path
 import json
@@ -131,7 +131,7 @@ init_db()
 
 # Use Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL_NAME"),
     "models/gemini-2.5-flash",
@@ -146,8 +146,10 @@ def create_gemini_model():
     for model_name in MODEL_CANDIDATES:
         try:
             # Test by generating content
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content("test")
+            response = client.models.generate_content(
+                model=model_name,
+                contents="test"
+            )
             return model_name
         except Exception as exc:
             last_error = exc
@@ -351,8 +353,10 @@ def save_quiz_result(student_id: str, subject: str, quiz_id: str, score: int, to
         return False
 
 def get_gemini_response(prompt, model="models/gemini-2.0-flash"):
-    model = genai.GenerativeModel(model)
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt
+    )
     return response.text
 
 @app.get("/")
