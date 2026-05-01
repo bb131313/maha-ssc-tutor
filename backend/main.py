@@ -120,6 +120,19 @@ def init_db():
             FOREIGN KEY(student_id) REFERENCES students(student_id)
         )''')
 
+        # Precompiled explanations
+        cursor.execute('''CREATE TABLE IF NOT EXISTS precompiled_explanations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            subject TEXT,
+            chapter TEXT,
+            language TEXT,
+            explanation TEXT,
+            audio_filename TEXT,
+            textbook_link TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(subject, chapter, language)
+        )''')
+
         conn.commit()
     except Exception:
         if conn:
@@ -449,6 +462,16 @@ def get_curriculum():
 def get_subjects():
     return {"subjects": list(CURRICULUM.keys())}
 
+@app.post("/api/precompile")
+def trigger_precompilation():
+    """Manually trigger precompilation of explanations"""
+    try:
+        precompile_thread = threading.Thread(target=precompile_explanations, daemon=True)
+        precompile_thread.start()
+        return {"status": "started", "message": "Precompilation started in background"}
+    except Exception as e:
+        raise HTTPException(500, f"Failed to start precompilation: {str(e)}")
+
 # Question Bank - Previous Maharashtra Board Question Papers
 QUESTION_BANK = {
     "Mathematics": {
@@ -495,8 +518,31 @@ QUESTION_BANK = {
 
 @app.post("/api/learn")
 def learn(req: LearnReq):
-    """Learn endpoint with session validation and error recovery"""
+    """Learn endpoint using precompiled explanations"""
     try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Try to get precompiled explanation
+        cursor.execute(
+            "SELECT explanation, audio_filename, textbook_link FROM precompiled_explanations WHERE subject = ? AND chapter = ? AND language = ?",
+            (req.subject, req.chapter, req.language)
+        )
+        
+        result = cursor.fetchone()
+        
+        if result:
+            return {
+                "explanation": result['explanation'],
+                "audio_url": f"/audio/{result['audio_filename']}",
+                "textbook_link": result['textbook_link'],
+                "timestamp": datetime.now().isoformat(),
+                "precompiled": True
+            }
+        
+        # Fallback to on-demand generation if not precompiled
+        print(f"Precompiled explanation not found for {req.subject} - {req.chapter} ({req.language}), generating on-demand...")
+        
         if not GEMINI_API_KEY:
             raise HTTPException(500, "GEMINI_API_KEY not set. Get free key at https://aistudio.google.com")
         
@@ -538,7 +584,8 @@ Keep language simple, friendly, and encouraging. Use easy words. Be like a teach
                     "explanation": explanation, 
                     "audio_url": f"/audio/{audio_filename}", 
                     "textbook_link": link,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
+                    "precompiled": False
                 }
             except Exception as inner_e:
                 if attempt < MAX_RETRIES - 1:
@@ -548,7 +595,10 @@ Keep language simple, friendly, and encouraging. Use easy words. Be like a teach
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"Failed to generate explanation: {str(e)}")
+        raise HTTPException(500, f"Failed to get explanation: {str(e)}")
+    finally:
+        if 'conn' in locals():
+            conn.close()
 
 @app.post("/api/detailed-explain")
 def detailed_explain(req: DetailedExplainReq):
